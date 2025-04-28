@@ -2,67 +2,71 @@ import streamlit as st
 import pickle
 import numpy as np
 
-    
+# Load model
 try:
     with open('stroke.pkl', 'rb') as f:
         model = pickle.load(f)
+    st.success("Model loaded successfully! Ready to predict.")
 except Exception as e:
     st.error(f"Failed to load model: {e}")
     st.stop()
-    
-st.title('Stroke')
-    
 
+st.title('Stroke Prediction App')
+
+# Input Fields
 age = st.number_input('Age :')
 bmi = st.number_input('BMI :')
 avg_glucose_level = st.number_input('Avg Glucose Level :')
 
-gender = st.selectbox('Gender',['Male','Female'])
-gender_map = {'Male':1, 'Female':0}
+gender = st.selectbox('Gender', ['Male', 'Female'])
+gender_map = {'Male': 1, 'Female': 0}
 
-Hypertension = st.selectbox('Hypertension',['Yes','No'])
-Hypertension_map = {'Yes':1, 'No':0}
+hypertension = st.selectbox('Hypertension', ['Yes', 'No'])
+hypertension_map = {'Yes': 1, 'No': 0}
 
-Heart_disease = st.selectbox('Heart disease',['Yes','No'])
-Heart_disease_map = {'Yes':1, 'No':0}
+heart_disease = st.selectbox('Heart Disease', ['Yes', 'No'])
+heart_disease_map = {'Yes': 1, 'No': 0}
 
-Ever_Maried = st.selectbox('Ever Maried',['Yes','No'])
-Ever_Maried_map = {'Yes':1, 'No':0}
+ever_married = st.selectbox('Ever Married', ['Yes', 'No'])
+ever_married_map = {'Yes': 1, 'No': 0}
 
-Residense_type = st.selectbox('Residense type',['Urban','Rural'])
-Residense_type_map = {'Urban':1, 'Rural':0}
+residence_type = st.selectbox('Residence Type', ['Urban', 'Rural'])
+residence_type_map = {'Urban': 1, 'Rural': 0}
 
-smoking_status = st.selectbox('Smoking Status',['Unknown','Formerly','Never_smoked','Smoke'])
-smoking_status_map = {'Unknown':0, 'Formerly':1, 'Never_smoked':2 ,'Smoke':3}
+smoking_status = st.selectbox('Smoking Status', ['Unknown', 'Formerly smoked', 'Never smoked', 'Smokes'])
+smoking_status_map = {'Unknown': 0, 'Formerly smoked': 1, 'Never smoked': 2, 'Smokes': 3}
 
-Work_Type = st.selectbox('Work Type',['Gov Job','Never Worked','Private','Self emp','Children',])
-Work_Type_map = {'Gov Job':0, 'Never Worked':1, 'Private':2 ,'Self emp':3, 'Children':4}
+work_type = st.selectbox('Work Type', ['Govt Job', 'Never Worked', 'Private', 'Self-employed', 'Children'])
+work_type_map = {'Govt Job': 0, 'Never Worked': 1, 'Private': 2, 'Self-employed': 3, 'Children': 4}
 
-gender_encoded = gender_map[gender]
-married_encoded = Ever_Maried_map[Ever_Maried]
-heart_disease_encoded = Heart_disease_map[Heart_disease]
-hypertension_encoded = Hypertension_map[Hypertension]
-residence_encoded = Residense_type_map[Residense_type]
-smoking_encoded = smoking_status_map[smoking_status]
-work_type_encoded = Work_Type_map[Work_Type]
+# Encoding Inputs
+encoded_inputs = {
+    'gender': gender_map[gender],
+    'ever_married': ever_married_map[ever_married],
+    'heart_disease': heart_disease_map[heart_disease],
+    'hypertension': hypertension_map[hypertension],
+    'residence_type': residence_type_map[residence_type],
+    'smoking_status': smoking_status_map[smoking_status],
+    'work_type': work_type_map[work_type]
+}
 
+# Prepare data for prediction
 input_data = np.array([[
-    gender_encoded,        # gender
-    age,                   # age
-    hypertension_encoded,  # hypertension
-    heart_disease_encoded, # heart_disease
-    married_encoded,       # ever_married
-    work_type_encoded,     # work_type
-    residence_encoded,     # Residence_type
-    avg_glucose_level,     # avg_glucose_level
-    bmi,                   # bmi
-    smoking_encoded        # smoking_status
+    encoded_inputs['gender'],
+    age,
+    encoded_inputs['hypertension'],
+    encoded_inputs['heart_disease'],
+    encoded_inputs['ever_married'],
+    encoded_inputs['work_type'],
+    encoded_inputs['residence_type'],
+    avg_glucose_level,
+    bmi,
+    encoded_inputs['smoking_status']
 ]])
 
 st.write("Encoded input to model:", input_data)
 
-print()
-
+# Prediction
 if st.button('Predict'):
     prediction = model.predict(input_data)
     
